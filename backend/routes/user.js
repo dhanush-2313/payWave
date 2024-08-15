@@ -15,35 +15,41 @@ const signupBody = zod.object({
 });
 
 router.post("/signup", async (req, res) => {
-  const payLoad = req.body;
-  const success = signupBody.safeParse(payLoad);
-  if (!success) {
-    return res.status(411).json({
-      message: "Email already taken / Incorrect inputs",
-    });
-  }
-  const existingUser = await User.findOne({ username: payLoad.username });
-  if (existingUser) {
-    return res.status(411).json({
-      message: "Email already taken / Incorrect inputs",
-    });
-  }
-  const dbUser = await User.create(payLoad);
-  const userId = dbUser._id;
-  await Account.create({
-    userId,
-    balance: 1 + Math.random() * 10000,
-  });
-  const jwttoken = jwt.sign(
-    {
+  try {
+    const payLoad = req.body;
+    const success = signupBody.safeParse(payLoad);
+    if (!success) {
+      return res.status(411).json({
+        message: "Email already taken / Incorrect inputs",
+      });
+    }
+    const existingUser = await User.findOne({ username: payLoad.username });
+    if (existingUser) {
+      return res.status(411).json({
+        message: "Email already taken / Incorrect inputs",
+      });
+    }
+    const dbUser = await User.create(payLoad);
+    const userId = dbUser._id;
+    await Account.create({
       userId,
-    },
-    token
-  );
-  return res.json({
-    message: "User created successfully",
-    token: jwttoken,
-  });
+      balance: 1 + Math.random() * 10000,
+    });
+    const jwttoken = jwt.sign(
+      {
+        userId,
+      },
+      token
+    );
+    return res.json({
+      message: "User created successfully",
+      token: jwttoken,
+    });
+  } catch {
+    () => {
+      console.log("some error");
+    };
+  }
 });
 
 const signinBody = zod.object({
@@ -52,28 +58,34 @@ const signinBody = zod.object({
 });
 
 router.post("/signin", async (req, res) => {
-  const payLoad = req.body;
-  const success = signinBody.safeParse(payLoad);
-  if (!success) {
-    return res.status(411).json({
-      message: "Incorrect inputs",
+  try {
+    const payLoad = req.body;
+    const success = signinBody.safeParse(payLoad);
+    if (!success) {
+      return res.status(411).json({
+        message: "Incorrect inputs",
+      });
+    }
+    const user = await User.findOne({
+      username: payLoad.username,
+      password: payLoad.password,
     });
-  }
-  const user = await User.findOne({
-    username: payLoad.username,
-    password: payLoad.password,
-  });
-  if (user) {
-    const tokenn = jwt.sign(
-      {
-        userId: user._id,
-      },
-      token
-    );
+    if (user) {
+      const tokenn = jwt.sign(
+        {
+          userId: user._id,
+        },
+        token
+      );
 
-    return res.status(200).json({
-      token: tokenn,
-    });
+      return res.status(200).json({
+        token: tokenn,
+      });
+    }
+  } catch {
+    () => {
+      console.log("some error occured");
+    };
   }
 });
 
