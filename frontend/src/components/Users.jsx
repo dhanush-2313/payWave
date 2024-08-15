@@ -20,11 +20,14 @@ export const Users = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3000/api/v1/user/bulk?filter=${debouncedFilter}`, {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      })
+      .get(
+        `https://paywave-gaty.onrender.com/api/v1/user/bulk?filter=${debouncedFilter}`,
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      )
       .then((response) => {
         setUsers(response.data.user);
       });
