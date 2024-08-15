@@ -1,12 +1,38 @@
-import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useState } from "react";
 
 export default function SendMoney() {
   const [searchParams] = useSearchParams();
   const [amount, setAmount] = useState(0);
+  const [success, setSuccess] = useState(null);
   const id = searchParams.get("id");
   const name = searchParams.get("name");
+  const navigate = useNavigate();
+
+  const handleTransaction = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/v1/account/transfer",
+        {
+          to: id,
+          amount,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+      setSuccess(response.data.message);
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
+    } catch (error) {
+      console.error("Transaction failed:", error);
+      setSuccess("Transaction failed");
+    }
+  };
 
   return (
     <div className="flex justify-center h-screen bg-gray-100">
@@ -26,42 +52,25 @@ export default function SendMoney() {
             </div>
             <div className="space-y-4">
               <div className="space-y-2">
-                <label
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  for="amount"
-                >
-                  Amount (in Rs)
+                <label className="block text-sm font-medium text-gray-700">
+                  Amount
                 </label>
                 <input
                   type="number"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  id="amount"
-                  placeholder="Enter amount"
-                  onChange={(e) => {
-                    setAmount(e.target.value);
-                  }}
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
               </div>
               <button
-                className="justify-center rounded-md text-sm font-medium ring-offset-background transition-colors h-10 px-4 py-2 w-full bg-green-500 text-white"
-                onClick={async () => {
-                  await axios.post(
-                    "http://localhost:3000/api/v1/account/transfer",
-                    {
-                      to: id,
-                      amount,
-                    },
-                    {
-                      headers: {
-                        Authorization:
-                          "Bearer " + localStorage.getItem("token"),
-                      },
-                    }
-                  );
-                }}
+                onClick={handleTransaction}
+                className="py-2 w-full bg-green-500 text-white"
               >
                 Initiate Transfer
               </button>
+              {success && (
+                <div className="mt-4 text-center text-green-600">{success}</div>
+              )}
             </div>
           </div>
         </div>

@@ -6,14 +6,29 @@ import { useNavigate } from "react-router-dom";
 export const Users = () => {
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("");
+  const [debouncedFilter, setDebouncedFilter] = useState(filter);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedFilter(filter);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [filter]);
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3000/api/v1/user/bulk?filter=${filter}`)
+      .get(`http://localhost:3000/api/v1/user/bulk?filter=${debouncedFilter}`, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      })
       .then((response) => {
         setUsers(response.data.user);
       });
-  }, [filter]);
+  }, [debouncedFilter]);
 
   return (
     <>

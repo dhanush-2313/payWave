@@ -12,6 +12,7 @@ export default function Signup() {
   const [lastName, setLastName] = useState("");
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   return (
@@ -52,20 +53,35 @@ export default function Signup() {
             <Button
               label={"Sign up"}
               onClick={async () => {
-                const response = await axios.post(
-                  "http://localhost:3000/api/v1/user/signup",
-                  {
-                    username,
-                    firstName,
-                    lastName,
-                    password,
+                if (!username || !firstName || !lastName || !password) {
+                  setError("All fields are required.");
+                  setInterval(() => setError(null), 3000);
+                  return;
+                }
+
+                try {
+                  const response = await axios.post(
+                    "http://localhost:3000/api/v1/user/signup",
+                    {
+                      username,
+                      firstName,
+                      lastName,
+                      password,
+                    }
+                  );
+                  localStorage.setItem("token", response.data.token);
+                  navigate("/dashboard");
+                } catch (error) {
+                  if (error.response) {
+                    setError(error.response.data.message);
+                  } else {
+                    setError("An unexpected error occurred.");
                   }
-                );
-                localStorage.setItem("token", response.data.token);
-                navigate("/dashboard");
+                }
               }}
             />
           </div>
+          {error && <div className="text-red-500">{error}</div>}
           <BottomWarning
             label={"Already have an account?"}
             buttonText={"Sign in"}

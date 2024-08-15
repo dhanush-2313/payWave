@@ -33,7 +33,7 @@ router.post("/signup", async (req, res) => {
     const userId = dbUser._id;
     await Account.create({
       userId,
-      balance: 1 + Math.random() * 10000,
+      balance: 1 + Math.floor(Math.random() * 10000),
     });
     const jwttoken = jwt.sign(
       {
@@ -109,19 +109,23 @@ router.put("/", authMiddleware, async (req, res) => {
   });
 });
 
-router.get("/bulk", async (req, res) => {
+router.get("/bulk", authMiddleware, async (req, res) => {
   const filter = req.query.filter || "";
+  const loggedInUserId = req.userId;
 
   const users = await User.find({
+    _id: { $ne: loggedInUserId },
     $or: [
       {
         firstName: {
           $regex: filter,
+          $options: "i",
         },
       },
       {
         lastName: {
           $regex: filter,
+          $options: "i",
         },
       },
     ],
@@ -135,6 +139,14 @@ router.get("/bulk", async (req, res) => {
       _id: user._id,
     })),
   });
+});
+
+router.get("/validate", authMiddleware, (req, res) => {
+  if (req.userId) {
+    return res.status(200).json({ message: "User is validated" });
+  } else {
+    return res.status(401).json({ message: "User is not authenticated" });
+  }
 });
 
 module.exports = router;

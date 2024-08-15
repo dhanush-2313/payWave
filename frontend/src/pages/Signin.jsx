@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 export default function Signin() {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+
   const navigate = useNavigate();
   return (
     <div className="bg-slate-300 h-screen flex justify-center">
@@ -35,18 +37,33 @@ export default function Signin() {
             <Button
               label={"Sign in"}
               onClick={async () => {
-                const response = await axios.post(
-                  "http://localhost:3000/api/v1/user/signin",
-                  {
-                    username,
-                    password,
+                if (!username || !password) {
+                  setError("All fields are required.");
+                  setInterval(() => setError(null), 3000);
+                  return;
+                }
+                try {
+                  const response = await axios.post(
+                    "http://localhost:3000/api/v1/user/signin",
+                    {
+                      username,
+                      password,
+                    }
+                  );
+                  localStorage.setItem("token", response.data.token);
+                  navigate("/dashboard");
+                } catch (error) {
+                  if (error.response) {
+                    setError(error.response.data.message);
+                  } else {
+                    setError("An unexpected error occurred.");
                   }
-                );
-                localStorage.setItem("token", response.data.token);
-                navigate("/dashboard");
+                }
               }}
             />
           </div>
+          {error && <div className="text-red-500">{error}</div>}
+
           <BottomWarning
             label={"Don't have an account?"}
             buttonText={"Sign up"}

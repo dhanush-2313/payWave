@@ -1,5 +1,5 @@
 import "./index.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import SignIn from "./pages/Signin";
 import Signup from "./pages/Signup";
@@ -9,7 +9,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Signup />} />
+        <Route path="/" element={<Navigate to="/signup" />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/dashboard" element={<Dashboard />} />
