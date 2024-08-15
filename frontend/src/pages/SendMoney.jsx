@@ -6,6 +6,7 @@ export default function SendMoney() {
   const [searchParams] = useSearchParams();
   const [amount, setAmount] = useState(0);
   const [success, setSuccess] = useState(null);
+  const [failed, setFailed] = useState(null);
   const id = searchParams.get("id");
   const name = searchParams.get("name");
   const navigate = useNavigate();
@@ -29,8 +30,19 @@ export default function SendMoney() {
         navigate("/dashboard");
       }, 2000);
     } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setFailed(error.response.data.message);
+      } else {
+        setFailed("Transaction failed");
+      }
       console.error("Transaction failed:", error);
-      setSuccess("Transaction failed");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
     }
   };
 
@@ -69,7 +81,10 @@ export default function SendMoney() {
                 Initiate Transfer
               </button>
               {success && (
-                <div className="mt-4 text-center text-green-600">{success}</div>
+                <div className="mt-4 text-center text-green-500">{success}</div>
+              )}
+              {failed && (
+                <div className="mt-4 text-center text-red-500">{failed}</div>
               )}
             </div>
           </div>
