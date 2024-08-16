@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 export default function Signin() {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ export default function Signin() {
                   setInterval(() => setError(null), 3000);
                   return;
                 }
+                setLoading(true);
                 try {
                   const response = await axios.post(
                     "https://paywave-mjsr.onrender.com/api/v1/user/signin",
@@ -52,6 +54,7 @@ export default function Signin() {
                   );
                   localStorage.setItem("token", response.data.token);
                   navigate("/dashboard");
+                  setLoading(false);
                 } catch (error) {
                   if (error.response) {
                     setError(error.response.data.message);
@@ -62,6 +65,7 @@ export default function Signin() {
               }}
             />
           </div>
+          {loading && <div className="text-black">Loading...</div>}
           {error && <div className="text-red-500">{error}</div>}
 
           <BottomWarning

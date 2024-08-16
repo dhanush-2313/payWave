@@ -11,6 +11,21 @@ export default function Dashboard() {
   if (token) {
     const [balance, setBalance] = useState(0);
     useEffect(() => {
+      setInterval(() => {
+        axios
+          .get("https://paywave-mjsr.onrender.com/api/v1/account/balance", {
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          })
+          .then((response) => {
+            setBalance(response.data.balance);
+          })
+          .catch((error) => {
+            console.error("Error fetching balance:", error);
+            setBalance();
+          });
+      }, 5000);
       axios
         .get("https://paywave-mjsr.onrender.com/api/v1/account/balance", {
           headers: {
