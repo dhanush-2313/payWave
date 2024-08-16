@@ -12,7 +12,7 @@ export default function Dashboard() {
     const [balance, setBalance] = useState(0);
     useEffect(() => {
       axios
-        .get("https://paywave-gaty.onrender.com/api/v1/account/balance", {
+        .get("https://paywave-mjsr.onrender.com/api/v1/account/balance", {
           headers: {
             Authorization: "Bearer " + token,
           },

@@ -21,7 +21,7 @@ export const Users = () => {
   useEffect(() => {
     axios
       .get(
-        `https://paywave-gaty.onrender.com/api/v1/user/bulk?filter=${debouncedFilter}`,
+        `https://paywave-mjsr.onrender.com/api/v1/user/bulk?filter=${debouncedFilter}`,
         {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token"),

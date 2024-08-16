@@ -14,7 +14,7 @@ export default function SendMoney() {
   const handleTransaction = async () => {
     try {
       const response = await axios.post(
-        "https://paywave-gaty.onrender.com/api/v1/account/transfer",
+        "https://paywave-mjsr.onrender.com/api/v1/account/transfer",
         {
           to: id,
           amount,
